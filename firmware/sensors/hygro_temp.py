@@ -5,7 +5,7 @@ from machine import SoftI2C, Pin
 class HygroTempSensor:
    
    
-    def __init__(self, i2c_bus, scl_pin, sda_pin, address, test_mode=False, temp_offset=0.0, hum_offset=0.0):
+    def __init__(self, i2c_bus, scl_pin, sda_pin, address, test_mode, temp_offset=0.0, hum_offset=0.0):
         self.test_mode = test_mode
         self.address = address
         self.i2c_bus = i2c_bus
@@ -24,7 +24,8 @@ class HygroTempSensor:
 
 
     def _real_read(self):
-        """Liest den CHT832X über SoftI2C aus."""
+        """Liest den Sensor über SoftI2C aus."""
+        # SoftI2C-Schnittstelle initialisieren, falls None
         if self.i2c is None:
             self.i2c = SoftI2C(
                 scl=Pin(self.scl_pin, Pin.PULL_UP), 
@@ -34,13 +35,17 @@ class HygroTempSensor:
             time.sleep(0.1)
             
         try:
+            # Sensor anpingen, um Messung zu starten
             self.i2c.writeto(self.address, bytes([0x24, 0x00]))
             time.sleep_ms(60)
+
+            # 6 Bytes vom Sensor lesen (Messdaten abholen)
             buf = self.i2c.readfrom(self.address, 6)
-            
+            # Bytes 2 und 4 werden ignoriert (CRC-Bytes / Prüfsummen-Bytes)
             temp_raw = (buf[0] << 8) | buf[1]
             humi_raw = (buf[3] << 8) | buf[4]
             
+            # Rohdaten in echte Werte umrechnen
             temp = -45.0 + 175.0 * (temp_raw / 65535.0)
             hum = 100.0 * (humi_raw / 65535.0)
             

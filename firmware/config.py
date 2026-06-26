@@ -15,6 +15,10 @@ HARDWARE_PINS = {
 
     "SoilTempSensor": [
         {"ds_pin": 15}
+    ],
+
+    "LightSensor": [
+        {"i2c_bus": 0, "scl_pin": 4, "sda_pin": 2, "address": 0x23}
     ]
 }
 

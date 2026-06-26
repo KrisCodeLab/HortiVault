@@ -11,6 +11,11 @@
       "type": "SoilTempSensor",
       "temp_offset": 0,
       "test_mode": false
+    },
+
+    "Lichtsensor": {
+      "type": "LightSensor",
+      "test_mode": false
     }
   }
 }

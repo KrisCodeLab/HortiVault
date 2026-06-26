@@ -26,7 +26,7 @@ class SoilTempSensor:
 
 
     def _real_read(self):
-        """Liest den DS18B20 über das 1-Wire Protokoll aus."""
+        """Liest den Sensor über das 1-Wire Protokoll aus."""
         if not self.roms:
             print("[Sensor Error] SoilTemp: Kein Sensor an diesem Pin gefunden!")
             return {"temperature": None}

@@ -1,14 +1,14 @@
-from machine import Pin, SoftI2C
+from machine import SoftI2C, Pin
 
-print("Starte I2C Scan auf SCL=22, SDA=23...")
-try:
-    i2c = SoftI2C(scl=Pin(22, Pin.PULL_UP), sda=Pin(23, Pin.PULL_UP), freq=10000)
-    devices = i2c.scan()
-    
-    if devices:
-        for d in devices:
-            print(f"Sensor antwortet auf Adresse: {d} (Hex: {hex(d)})")
-    else:
-        print("-> Keine Sensoren gefunden.")
-except Exception as e:
-    print(f"-> Fehler: {e}")
+# Deine eingestellten Pins
+i2c = SoftI2C(scl=Pin(4), sda=Pin(2), freq=10000)
+
+print("Scanne I2C Bus...")
+devices = i2c.scan()
+
+if len(devices) == 0:
+    print("Kein Sensor gefunden! (Hardware/Kabel-Problem)")
+else:
+    print("Geräte gefunden unter Adresse(n):")
+    for device in devices:
+        print(f"- Hex: {hex(device)}")

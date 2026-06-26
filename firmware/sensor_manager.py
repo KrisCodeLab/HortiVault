@@ -1,6 +1,6 @@
 import config
 import json
-from sensors import HygroTempSensor, SoilTempSensor
+from sensors import HygroTempSensor, SoilTempSensor, LightSensor
 
 # Registry mit allen bekannten Sensor-Klassen
 SENSOR_REGISTRY = {
@@ -12,6 +12,11 @@ SENSOR_REGISTRY = {
     "SoilTempSensor": {
         "class": SoilTempSensor, 
         "allowed_args": ["temp_offset", "test_mode"]
+    },
+
+    "LightSensor": {
+        "class": LightSensor,
+        "allowed_args": ["test_mode"]
     }
 }
 
@@ -61,16 +66,15 @@ def _build_sensors(settings_json):
             continue
             
         # Sensor Parameter zusammenstellen
-        kwargs : dict[str, object] = {
-        #    "test_mode": config.TEST_MODE,
-        }
+        kwargs = {}
 
-        kwargs.update(assigned_pins) # Die ermittelten Pins hinzufügen
-        
         # Nur die erlaubten Argumente aus der Benutzereingabe übernehmen
         for arg in allowed_args:
             if arg in user_config:
                 kwargs[arg] = user_config[arg]
+
+        # Die ermittelten Pins hinzufügen
+        kwargs.update(assigned_pins)
         
         # Sensor-Objekt instanziieren und in active_sensors speichern
         try:
