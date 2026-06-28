@@ -7,13 +7,13 @@ import ds18x20
 class SoilTempSensor:
 
 
-    def __init__(self, ds_pin, test_mode, temp_offset=0.0):
+    def __init__(self, ds_pin, test_mode, temp_offset=0.0):    
+        self.ds_pin = machine.Pin(ds_pin)
+        self.ow_bus = onewire.OneWire(self.ds_pin)
+        self.ds_sensor = ds18x20.DS18X20(self.ow_bus)
+
         self.test_mode = test_mode
         self.temp_offset = temp_offset
-        
-        self.ds_pin_obj = machine.Pin(ds_pin)
-        self.ow_bus = onewire.OneWire(self.ds_pin_obj)
-        self.ds_sensor = ds18x20.DS18X20(self.ow_bus)
         
         self.roms = self.ds_sensor.scan()
 

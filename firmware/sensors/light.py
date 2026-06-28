@@ -6,11 +6,11 @@ class LightSensor:
    
    
     def __init__(self, i2c_bus, scl_pin, sda_pin, address, test_mode):
-        self.test_mode = test_mode
-        self.address = address
         self.i2c_bus = i2c_bus
         self.scl_pin = scl_pin
         self.sda_pin = sda_pin
+        self.address = address
+        self.test_mode = test_mode
         self.i2c = None
 
 

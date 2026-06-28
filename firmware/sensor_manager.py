@@ -1,6 +1,6 @@
 import config
 import json
-from sensors import HygroTempSensor, SoilTempSensor, LightSensor
+from sensors import HygroTempSensor, SoilTempSensor, LightSensor, SoilMoistureSensor
 
 # Registry mit allen bekannten Sensor-Klassen
 SENSOR_REGISTRY = {
@@ -17,6 +17,11 @@ SENSOR_REGISTRY = {
     "LightSensor": {
         "class": LightSensor,
         "allowed_args": ["test_mode"]
+    },
+
+    "SoilMoistureSensor": {
+        "class": SoilMoistureSensor,
+        "allowed_args": ["air_value", "water_value", "test_mode"]      
     }
 }
 

@@ -1,6 +1,7 @@
 import time
 import json
 import sensor_manager
+import gc
 
 print("hortivault – System bootet...")
 
@@ -20,8 +21,13 @@ while True:
             sensor_data[sensor_name] = {"error": str(e)}
     
     if sensor_data:
-        print(json.dumps(sensor_data))
+        try:
+            print(json.dumps(sensor_data))
+        # Excpetion, falls der Server nicht erreichbar ist oder der Puffer blockiert ist
+        except OSError as e:
+            print(json.dumps({"error": str(e)}))
     else:
         print("[Warnung] Keine Sensoren aktiv.")
         
+    gc.collect()
     time.sleep(5)

@@ -6,14 +6,14 @@ class HygroTempSensor:
    
    
     def __init__(self, i2c_bus, scl_pin, sda_pin, address, test_mode, temp_offset=0.0, hum_offset=0.0):
-        self.test_mode = test_mode
-        self.address = address
         self.i2c_bus = i2c_bus
         self.scl_pin = scl_pin
         self.sda_pin = sda_pin
-        self.i2c = None
+        self.address = address
+        self.test_mode = test_mode
         self.temp_offset = temp_offset
         self.hum_offset = hum_offset
+        self.i2c = None
 
 
     def read(self):

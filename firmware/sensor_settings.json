@@ -13,9 +13,16 @@
       "test_mode": false
     },
 
-    "Lichtsensor": {
+    "Licht": {
       "type": "LightSensor",
       "test_mode": false
+    },
+
+    "Boden Feuchte": {
+      "type": "SoilMoistureSensor",
+      "test_mode": true,
+      "air_value": 2646,
+      "water_value": 0
     }
   }
 }
