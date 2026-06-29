@@ -3,6 +3,9 @@ import random
 from machine import SoftI2C, Pin
 
 class HygroTempSensor:
+    UNIT_TEMP = "celsius"
+    UNIT_HUM = "percent"
+    UNIT_RAW = "i2c_raw"
    
    
     def __init__(self, i2c_bus, scl_pin, sda_pin, address, test_mode, temp_offset=0.0, hum_offset=0.0):
@@ -53,26 +56,62 @@ class HygroTempSensor:
             hum += self.hum_offset
             
             return {
-                "temperature": round(temp, 1),
-                "humidity": round(hum, 1)
+                "is_test": False,
+
+                "real": {
+                    "temperature": {"value": round(temp, 1), "unit": self.UNIT_TEMP},
+                    "humidity": {"value": round(hum, 1), "unit": self.UNIT_HUM}
+                },
+
+                "raw": {
+                    "temperature": {"value": temp_raw, "unit": self.UNIT_RAW},
+                    "humidity": {"value": humi_raw, "unit": self.UNIT_RAW}
+                }
             }
             
         except Exception as e:
             self.i2c = None
             print(f"[Sensor Error] HygroTemp: {e}")
-            return {"temperature": None, "humidity": None}
+            return self._sensor_error()
 
 
     def _test_read(self):
         """Generiert Mock-Daten für den Testmodus."""
-        temp = round(random.uniform(18.0, 26.0), 1)
-        hum = round(random.uniform(50.0, 75.0), 1)
+        temp_raw = random.randint(20000, 40000)
+        humi_raw = random.randint(30000, 50000)
+
+        temp = -45.0 + 175.0 * (temp_raw / 65535.0)
+        hum = 100.0 * (humi_raw / 65535.0)
         
         temp += self.temp_offset
         hum += self.hum_offset
         
         return {
-            "temperature": round(temp, 1),
-            "humidity": round(hum, 1)
+            "is_test": True,
+
+            "real": {
+                "temperature": {"value": round(temp, 1), "unit": self.UNIT_TEMP},
+                "humidity": {"value": round(hum, 1), "unit": self.UNIT_HUM}
+            },
+
+            "raw": {
+                "temperature": {"value": temp_raw, "unit": self.UNIT_RAW},
+                "humidity": {"value": humi_raw, "unit": self.UNIT_RAW}
+            }
         }
     
+
+    def _sensor_error(self):
+        return {
+            "is_test": self.test_mode,
+
+            "real": {
+                "temperature": {"value": None, "unit": self.UNIT_TEMP},
+                "humidity": {"value": None, "unit": self.UNIT_HUM}
+            },
+            
+            "raw": {
+                "temperature": {"value": None, "unit": self.UNIT_RAW},
+                "humidity": {"value": None, "unit": self.UNIT_RAW}
+            }
+        }

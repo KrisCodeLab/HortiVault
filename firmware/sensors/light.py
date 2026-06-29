@@ -3,7 +3,9 @@ import random
 from machine import SoftI2C, Pin
 
 class LightSensor:
-   
+    UNIT_LIGHT = "lux"
+    UNIT_RAW = "i2c_raw"
+
    
     def __init__(self, i2c_bus, scl_pin, sda_pin, address, test_mode):
         self.i2c_bus = i2c_bus
@@ -44,20 +46,33 @@ class LightSensor:
             # Rohdaten in echte Werte umrechnen
             lux = raw_lux / 1.2
 
-            return {
-                "lux": round(lux, 1)
+            return { 
+                "is_test": False,
+                "real": {"light": {"value": round(lux, 1), "unit": self.UNIT_LIGHT}},
+                "raw": {"light": {"value": raw_lux, "unit": self.UNIT_RAW}}
             }
         
         except Exception as e:
             self.i2c = None
             print(f"[Sensor Error] Lightsensor: {e}")
-            return {"lux": None}
+            return self._sensor_error()
 
 
     def _test_read(self):
         """Generiert Mock-Daten für den Testmodus."""
-        lux = round(random.uniform(300.0, 1000.0), 1)
+        raw_lux = random.randint(100, 5000)
+        lux = raw_lux / 1.2
+        
+        return { 
+            "is_test": True,
+            "real": {"light": {"value": round(lux, 1), "unit": self.UNIT_LIGHT}},
+            "raw": {"light": {"value": raw_lux, "unit": self.UNIT_RAW}}
+        }
+    
 
-        return {
-            "lux": round(lux, 1)
-        }    
+    def _sensor_error(self):
+        return { 
+                "is_test": self.test_mode,
+                "real": {"light": {"value": None, "unit": self.UNIT_LIGHT}},
+                "raw": {"light": {"value": None, "unit": self.UNIT_RAW}}
+        }

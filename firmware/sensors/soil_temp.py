@@ -5,6 +5,8 @@ import onewire
 import ds18x20
 
 class SoilTempSensor:
+    TEMP_UNIT = "celsius"
+    RAW_UNIT = "raw_ds"
 
 
     def __init__(self, ds_pin, test_mode, temp_offset=0.0):    
@@ -15,7 +17,10 @@ class SoilTempSensor:
         self.test_mode = test_mode
         self.temp_offset = temp_offset
         
-        self.roms = self.ds_sensor.scan()
+        try:
+            self.roms = self.ds_sensor.scan()
+        except Exception:
+            self.roms = []
 
 
     def read(self):
@@ -28,8 +33,14 @@ class SoilTempSensor:
     def _real_read(self):
         """Liest den Sensor über das 1-Wire Protokoll aus."""
         if not self.roms:
+            try:
+                self.roms = self.ds_sensor.scan()
+            except Exception:
+                pass 
+
+        if not self.roms:
             print("[Sensor Error] SoilTemp: Kein Sensor an diesem Pin gefunden!")
-            return {"temperature": None}
+            return self._sensor_error()
             
         try:
             self.ds_sensor.convert_temp()
@@ -40,12 +51,14 @@ class SoilTempSensor:
             temp += self.temp_offset
             
             return {
-                "temperature": round(temp, 1)
+                "is_test": False,
+                "real": {"temperature": {"value": round(temp, 1), "unit": self.TEMP_UNIT}},
+                "raw": {"temperature": {"value": int(temp * 16), "unit": self.RAW_UNIT}}
             }
             
         except Exception as e:
             print(f"[Sensor Error] SoilTemp: {e}")
-            return {"temperature": None}
+            return self._sensor_error()
 
 
     def _test_read(self):
@@ -54,5 +67,15 @@ class SoilTempSensor:
         temp += self.temp_offset
         
         return {
-            "temperature": round(temp, 1)
+            "is_test": True,
+            "real": {"temperature": {"value": round(temp, 1), "unit": self.TEMP_UNIT}},
+            "raw": {"temperature": {"value": int(temp * 16), "unit": self.RAW_UNIT}}
+        }
+    
+
+    def _sensor_error(self):
+        return {
+            "is_test": self.test_mode,
+            "real": {"temperature": {"value": None, "unit": self.TEMP_UNIT}},
+            "raw": {"temperature": {"value": None, "unit": self.RAW_UNIT}}
         }
