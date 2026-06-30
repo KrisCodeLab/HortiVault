@@ -216,3 +216,19 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Python Cache
+__pycache__/
+*.pyc
+
+# Venv
+backend/venv/
+
+# VS Code 
+backend/.vscode/settings.json
+.vscode/settings.json
+
+# Betriebssystem-Dateien
+.DS_Store
+
+
